@@ -31,6 +31,22 @@ class MessageFormatter {
         ]
         };
     }
+
+    static topicNotFound () {
+        return {
+        "attachments": [
+            {
+                "title": "Topic not found",
+                "color": "bad",
+                "text": "send /learn everything to see full list",
+                "mrkdwn_in": [
+                    "text",
+                    "pretext"
+                ]
+            }
+        ]
+        };
+    }
 }
 
 module.exports = MessageFormatter;

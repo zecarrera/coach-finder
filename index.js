@@ -1,24 +1,28 @@
-var http            = require('http');
-var express         = require('express');
-var request         = require('request');
-var bodyParser      = require('body-parser');
-var mongoose        = require('mongoose');
-var seedDB          = require("./seeds");
-var Topic           = require("./models/topic");
-var MessageFormatter= require("./message-formatter");
-var clientId        = process.env.CLIENT_ID;
-var clientSecret    = process.env.CLIENT_SECRET ;
-var app             = express();
+var http = require('http');
+var express = require('express');
+var request = require('request');
+var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var seedDB = require("./seeds");
+var Topic = require("./models/topic");
+var MessageFormatter = require("./message-formatter");
+var clientId = process.env.CLIENT_ID;
+var clientSecret = process.env.CLIENT_SECRET;
+var app = express();
 
-mongoose.connect("mongodb://localhost/coach_finder", {useMongoClient: true});
+mongoose.connect("mongodb://localhost/coach_finder", {
+    useMongoClient: true
+});
 
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 seedDB();
 
-const PORT=3131;
+const PORT = 3131;
 
 // Lets start our server
-app.listen(PORT, function () {
+app.listen(PORT, function() {
     //Callback triggered when server is successfully listening. Hurray!
     console.log("Coach Finder listening on port " + PORT);
 });
@@ -33,16 +37,22 @@ app.get('/oauth', function(req, res) {
     // When a user authorizes an app, a code query parameter is passed on the oAuth endpoint. If that code is not there, we respond with an error message
     if (!req.query.code) {
         res.status(500);
-        res.send({"Error": "Looks like we're not getting code."});
+        res.send({
+            "Error": "Looks like we're not getting code."
+        });
         console.log("Looks like we're not getting code.");
     } else {
         // We'll do a GET call to Slack's `oauth.access` endpoint, passing our app's client ID, client secret, and the code we just got as query parameters.
         request({
             url: 'https://slack.com/api/oauth.access', //URL to hit
-            qs: {code: req.query.code, client_id: clientId, client_secret: clientSecret}, //Query string data
+            qs: {
+                code: req.query.code,
+                client_id: clientId,
+                client_secret: clientSecret
+            }, //Query string data
             method: 'GET',
 
-        }, function (error, response, body) {
+        }, function(error, response, body) {
             if (error) {
                 console.log(error);
             } else {
@@ -63,11 +73,10 @@ app.post('/coach', function(req, res) {
         coachUsername: req.body.user_name,
         topicTitle: req.body.text
     };
-    Topic.create(newTopic,function(error, result)
-    {
-        if (error){
+    Topic.create(newTopic, function(error, result) {
+        if (error) {
             console.log(error);
-        }else{
+        } else {
             console.log("Topic created");
             res.send(MessageFormatter.formatSuccessMessage(result));
         }
@@ -77,15 +86,43 @@ app.post('/coach', function(req, res) {
 
 app.post('/learn', function(req, res) {
     topicToLearn = req.body.text;
-    Topic.find({}, function(error, foundTopics){
-            if(error){
+    if (topicToLearn.toLowerCase() === "everything") {
+        Topic.find({}, function(error, foundTopics) {
+            if (error) {
                 console.log(error);
-            }else{
+            } else {
                 var textToSendBack = "";
-                foundTopics.forEach(function(topic){
-                    textToSendBack = textToSendBack +  topic.topicTitle + " - " + "<@"+ topic.coachUsername+ ">\n";
+                foundTopics.forEach(function(topic) {
+                    textToSendBack = textToSendBack + topic.topicTitle + " - " + "<@" + topic.coachUsername + ">\n";
                 });
-                res.send(MessageFormatter.formatTopicList(textToSendBack));
+                textToSendBack = MessageFormatter.formatTopicList(textToSendBack);
+                res.send(textToSendBack);
             }
         });
+    } else {
+        var query = getTopics(topicToLearn);
+        query.exec(function(err, foundTopics) {
+            if (err) {
+                return console.log(err);
+            } else {
+                var textToSendBack = "";
+                if(foundTopics.length > 0){
+                    foundTopics.forEach(function(topic) {
+                        textToSendBack = textToSendBack + topic.topicTitle + " - " + "<@" + topic.coachSlackId + ">\n";
+                    });
+                    textToSendBack =  MessageFormatter.formatTopicList(textToSendBack);
+                }else{
+                    textToSendBack = MessageFormatter.topicNotFound();
+                }
+                res.send(textToSendBack);
+            }
+        });
+    }
 });
+
+function getTopics(topicTitle) {
+    var query = Topic.find({
+        topicTitle: topicTitle
+    });
+    return query;
+}
