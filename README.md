@@ -1,8 +1,8 @@
 # coach-finder
 - Running locally
-1. Download ngrok
-2. Run ngrok with desired port to create a tunnel ./ngrok http 3131
-3. Point all slack app urls to the tunnel created by ngrok
+1. npm install -g localtunnel
+2. Start local tunnel -> lt --port 3131 --subdomain coachfindertest
+3. npm start on the app
 
 -Start server
 npm start (starts local server, runs seeds.js to set up test data on mongo)
@@ -17,3 +17,4 @@ Adds user to topic list as a coach for a given topic
 
 - /learn [topic]
 Returns a list of coaches for the given topics. If topic is not found full list is returned.
+* /learn everything -> brings the full list of coach/topics

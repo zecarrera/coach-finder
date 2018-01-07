@@ -45,4 +45,8 @@ describe('When calling server', () => {
             });
         });
     });
+
+    //TODO: post existing topic for user should not add repeated done
+    // post existing topic different user, should group users together
+    // 
 });

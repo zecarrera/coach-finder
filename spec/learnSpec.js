@@ -89,4 +89,8 @@ describe('When calling server with POST /learn', () => {
         });
     });
 
+//TODO: tests to add
+// search for "thing" should bring all topics with "thing" (https://stackoverflow.com/questions/9824010/mongoose-js-find-user-by-username-like-value)
+// search for username should bring all topics coached by that user
+// test with longer list of results to see how it is displayed
 });
