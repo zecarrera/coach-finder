@@ -1,18 +1,19 @@
 # coach-finder
 - Running locally
-1. npm install -g localtunnel
-2. Start local tunnel -> lt --port 3131 --subdomain coachfindertest
-3. npm start on the app
+1. `npm install -g localtunnel`
+2. Start local tunnel `lt --port 3131 --subdomain coachfindertest`
+3. start local mongodb
+4. `npm start` on the app
 
 -Start server
-npm start (starts local server, runs seeds.js to set up test data on mongo)
+`npm start` (starts local server, runs seeds.js to set up test data on mongo)
 
 -Run tests
-npm test
+`npm test`
 
 
 ## Basic usage
-- /coach [topic]
+- /coach [topic] with [number of slots] slots
 Adds user to topic list as a coach for a given topic
 
 - /learn [topic]
