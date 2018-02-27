@@ -19,11 +19,26 @@ class MessageFormatter {
     static formatTopicList (listOfTopicsToPresent) {
         let messageAttachments = [];
         listOfTopicsToPresent.forEach(topic => {
-            let attachment = { "title": topic.topicTitle, "text": "coach: "+"<@" + topic.coachUsername + ">"+ " slots: "+topic.totalSlots, "title_link": "http://www.test.com", "color": "good"};
-            messageAttachments.push(attachment)
+            let attachment =
+            {
+                "title": topic.topicTitle,
+                "text": "coach: "+"<@" + topic.coachUsername + ">"+ " slots: "+topic.totalSlots,
+                "title_link": "https://coachfindertest.localtunnel.me",
+                "callback_id": "toggle_registration",
+                "color": "good",
+                "actions":[
+                    {
+                        "name": "toggle-registration",
+                        "text": "Join/Drop-out",
+                        "type": "button",
+                        "value": topic.topicTitle
+                    }
+                ]
+            };
+            messageAttachments.push(attachment);
         });
         return {
-            "text": "Full List of Topics \n _click link to subscribe_",
+            "text": "Full List of Topics \n _click link to view details_",
             "attachments": messageAttachments
         };
     }

@@ -116,6 +116,27 @@ app.post('/learn', function(req, res) {
     }
 });
 
+app.post('/registration', function(req, res) {
+    //payload data is properly hitting the endpoint, need now to :
+    //1. create object with topic title, user name and id
+    //2. submit registration
+    //2.1 --1 on the availableSlots
+    //when that is finished, implement the unregistration
+    //then update how the list of topics is built, to:
+    //1 - show when no slots are available
+    //2 - change button text if user is already reigsteerd
+    console.log("registration - user");
+    var payload = JSON.parse(req.body.payload);
+    console.log(payload);
+    console.log("actions - topic title");
+    payload.actions.forEach(action => {
+        console.log(action);
+    });
+
+    var user = payload.user;
+    console.log(JSON.stringify(user));
+});
+
 function extractTitle(message){
     let endIndex = message.indexOf("with") -1;
     return message.substring(0, endIndex);
