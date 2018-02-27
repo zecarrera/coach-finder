@@ -94,8 +94,7 @@ app.post('/learn', function(req, res) {
             if (error) {
                 console.log(error);
             } else {
-                var textToSendBack = buildTopicList(foundTopics);
-                textToSendBack = MessageFormatter.formatTopicList(textToSendBack);
+                var textToSendBack = MessageFormatter.formatTopicList(foundTopics);
                 res.send(textToSendBack);
             }
         });
@@ -107,8 +106,7 @@ app.post('/learn', function(req, res) {
             } else {
                 var textToSendBack = "";
                 if(foundTopics.length > 0){
-                    textToSendBack = buildTopicList(foundTopics);
-                    textToSendBack = MessageFormatter.formatTopicList(textToSendBack);
+                    textToSendBack = MessageFormatter.formatTopicList(foundTopics);
                 }else{
                     textToSendBack = MessageFormatter.topicNotFound();
                 }
@@ -129,13 +127,6 @@ function extractTotalSlots(message){
     return Number(message.substring(startIndex, endIndex));
 }
 
-function buildTopicList(foundTopics){
-    var textToSendBack = "";
-    foundTopics.forEach(function(topic) {
-        textToSendBack = textToSendBack + topic.topicTitle + " - " + "<@" + topic.coachUsername + "> - " + topic.totalSlots + "\n";
-    });
-    return textToSendBack;
-}
 function getTopics(topicTitle) {
     var query = Topic.find({
         topicTitle: topicTitle

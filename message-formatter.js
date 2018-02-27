@@ -16,19 +16,15 @@ class MessageFormatter {
         };
     }
 
-    static formatTopicList (textToFormat) {
+    static formatTopicList (listOfTopicsToPresent) {
+        let messageAttachments = [];
+        listOfTopicsToPresent.forEach(topic => {
+            let attachment = { "title": topic.topicTitle, "text": "coach: "+"<@" + topic.coachUsername + ">"+ " slots: "+topic.totalSlots, "title_link": "http://www.test.com", "color": "good"};
+            messageAttachments.push(attachment)
+        });
         return {
-        "attachments": [
-            {
-                "title": "Full List of Topics",
-                "color": "good",
-                "text": `${textToFormat}`,
-                "mrkdwn_in": [
-                    "text",
-                    "pretext"
-                ]
-            }
-        ]
+            "text": "Full List of Topics \n _click link to subscribe_",
+            "attachments": messageAttachments
         };
     }
 

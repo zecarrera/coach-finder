@@ -47,6 +47,6 @@ describe('When calling server', () => {
     });
 
     //TODO: post existing topic for user should not add repeated done
-    // post existing topic different user, should group users together
-    //
+    // post existing topic different user, should not be allowed
+    // reject topic if slots are not provided or valid
 });

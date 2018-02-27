@@ -22,12 +22,12 @@ describe('When calling server with POST /learn', () => {
             request(options, function(error, response, body) {
                 if (error) throw new Error(error);
                 var slackMessage = JSON.parse(response.body);
-                expect(slackMessage.attachments[0].text.indexOf('thing 1') !== -1).toBe(true);
+                expect(slackMessage.attachments[0].title.indexOf('thing 1') !== -1).toBe(true);
                 expect(slackMessage.attachments[0].text.indexOf('10') !== -1).toBe(true);
-                expect(slackMessage.attachments[0].text.indexOf('thing 2') !== -1).toBe(true);
-                expect(slackMessage.attachments[0].text.indexOf('11') !== -1).toBe(true);
-                expect(slackMessage.attachments[0].text.indexOf('thing 3') !== -1).toBe(true);
-                expect(slackMessage.attachments[0].text.indexOf('12') !== -1).toBe(true);
+                expect(slackMessage.attachments[1].title.indexOf('thing 2') !== -1).toBe(true);
+                expect(slackMessage.attachments[1].text.indexOf('11') !== -1).toBe(true);
+                expect(slackMessage.attachments[2].title.indexOf('thing 3') !== -1).toBe(true);
+                expect(slackMessage.attachments[2].text.indexOf('12') !== -1).toBe(true);
 
                 done();
             });
@@ -53,13 +53,10 @@ describe('When calling server with POST /learn', () => {
             request(options, function(error, response, body) {
                 if (error) throw new Error(error);
                 var slackMessage = JSON.parse(response.body);
-                expect(slackMessage.attachments[0].text.indexOf('thing 1') !== -1).toBe(true);
+                expect(slackMessage.attachments[0].title.indexOf('thing 1') !== -1).toBe(true);
                 expect(slackMessage.attachments[0].text.indexOf('coachone') !== -1).toBe(true);
                 expect(slackMessage.attachments[0].text.indexOf('10') !== -1).toBe(true);
-                expect(slackMessage.attachments[0].text.indexOf('thing 2') !== -1).toBe(false);
-                expect(slackMessage.attachments[0].text.indexOf('11') !== -1).toBe(false);
-                expect(slackMessage.attachments[0].text.indexOf('thing 3') !== -1).toBe(false);
-                expect(slackMessage.attachments[0].text.indexOf('12') !== -1).toBe(false);
+                expect(slackMessage.attachments.length).toBe(1);
                 done();
             });
         });
@@ -87,10 +84,7 @@ describe('When calling server with POST /learn', () => {
                 console.log("message-->"+JSON.stringify(slackMessage));
                 expect(slackMessage.attachments[0].title.indexOf('Topic not found') !== -1).toBe(true);
                 expect(slackMessage.attachments[0].text.indexOf('send /learn everything to see full list') !== -1).toBe(true);
-                expect(slackMessage.attachments[0].text.indexOf('thing 1') !== -1).toBe(false);
-                expect(slackMessage.attachments[0].text.indexOf('12345') !== -1).toBe(false);
-                expect(slackMessage.attachments[0].text.indexOf('thing 2') !== -1).toBe(false);
-                expect(slackMessage.attachments[0].text.indexOf('thing 3') !== -1).toBe(false);
+                expect(slackMessage.attachments.length).toBe(1);
                 done();
             });
         });
@@ -100,4 +94,5 @@ describe('When calling server with POST /learn', () => {
 // search for "thing" should bring all topics with "thing" (https://stackoverflow.com/questions/9824010/mongoose-js-find-user-by-username-like-value)
 // search for username should bring all topics coached by that user
 // test with longer list of results to see how it is displayed
+// add behaviour to subscribe to topic when clicking the link, it needs to -1 on the availableSlots and keep track of the users list
 });
