@@ -6,7 +6,7 @@ class MessageFormatter {
                 "title": "WOW, Nice job!",
                 "pretext": "Coach topics _updated_",
                 "color": "good",
-                "text": `<@${addedTopic.coachSlackId}> is now listed as coach for *${addedTopic.topicTitle}*`,
+                "text": `<@${addedTopic.coachSlackId}> is now listed as coach for *${addedTopic.topicTitle}* with *${addedTopic.totalSlots}* slots`,
                 "mrkdwn_in": [
                     "text",
                     "pretext"

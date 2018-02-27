@@ -29,7 +29,7 @@ app.listen(PORT, function() {
 
 // This route handles GET requests to our root ngrok address and responds with the same "Ngrok is working message" we used before
 app.get('/', function(req, res) {
-    res.send('Ngrok is working! Path Hit: ' + req.url);
+    res.send('Local tunnel is working! Path Hit: ' + req.url);
 });
 
 // This route handles get request to a /oauth endpoint. We'll use this endpoint for handling the logic of the Slack oAuth process behind our app.
@@ -64,14 +64,17 @@ app.get('/oauth', function(req, res) {
 
 // Route the endpoint that our slash command will point to and send back a simple response to indicate that ngrok is working
 app.post('/command', function(req, res) {
-    res.send('Your ngrok tunnel is up and running!');
+    res.send('Your local tunnel is up and running!');
 });
 
 app.post('/coach', function(req, res) {
+    let slots = extractTotalSlots(req.body.text);
     var newTopic = {
         coachSlackId: req.body.user_id,
         coachUsername: req.body.user_name,
-        topicTitle: req.body.text
+        topicTitle: extractTitle(req.body.text),
+        totalSlots: slots,
+        availableSlots: slots
     };
     Topic.create(newTopic, function(error, result) {
         if (error) {
@@ -91,10 +94,7 @@ app.post('/learn', function(req, res) {
             if (error) {
                 console.log(error);
             } else {
-                var textToSendBack = "";
-                foundTopics.forEach(function(topic) {
-                    textToSendBack = textToSendBack + topic.topicTitle + " - " + "<@" + topic.coachUsername + ">\n";
-                });
+                var textToSendBack = buildTopicList(foundTopics);
                 textToSendBack = MessageFormatter.formatTopicList(textToSendBack);
                 res.send(textToSendBack);
             }
@@ -107,10 +107,8 @@ app.post('/learn', function(req, res) {
             } else {
                 var textToSendBack = "";
                 if(foundTopics.length > 0){
-                    foundTopics.forEach(function(topic) {
-                        textToSendBack = textToSendBack + topic.topicTitle + " - " + "<@" + topic.coachSlackId + ">\n";
-                    });
-                    textToSendBack =  MessageFormatter.formatTopicList(textToSendBack);
+                    textToSendBack = buildTopicList(foundTopics);
+                    textToSendBack = MessageFormatter.formatTopicList(textToSendBack);
                 }else{
                     textToSendBack = MessageFormatter.topicNotFound();
                 }
@@ -120,6 +118,24 @@ app.post('/learn', function(req, res) {
     }
 });
 
+function extractTitle(message){
+    let endIndex = message.indexOf("with") -1;
+    return message.substring(0, endIndex);
+}
+
+function extractTotalSlots(message){
+    let startIndex = message.indexOf("with") + 4;
+    let endIndex = message.indexOf("slots");
+    return Number(message.substring(startIndex, endIndex));
+}
+
+function buildTopicList(foundTopics){
+    var textToSendBack = "";
+    foundTopics.forEach(function(topic) {
+        textToSendBack = textToSendBack + topic.topicTitle + " - " + "<@" + topic.coachUsername + "> - " + topic.totalSlots + "\n";
+    });
+    return textToSendBack;
+}
 function getTopics(topicTitle) {
     var query = Topic.find({
         topicTitle: topicTitle

@@ -1,6 +1,6 @@
 var request = require("request");
 
-var base_url = "http://12b62e46.ngrok.io"
+var base_url = "https://coachfindertest.localtunnel.me"
 
 describe('When calling server with POST /learn', () => {
     describe('with topic set to "everything"', () => {
@@ -23,8 +23,12 @@ describe('When calling server with POST /learn', () => {
                 if (error) throw new Error(error);
                 var slackMessage = JSON.parse(response.body);
                 expect(slackMessage.attachments[0].text.indexOf('thing 1') !== -1).toBe(true);
+                expect(slackMessage.attachments[0].text.indexOf('10') !== -1).toBe(true);
                 expect(slackMessage.attachments[0].text.indexOf('thing 2') !== -1).toBe(true);
+                expect(slackMessage.attachments[0].text.indexOf('11') !== -1).toBe(true);
                 expect(slackMessage.attachments[0].text.indexOf('thing 3') !== -1).toBe(true);
+                expect(slackMessage.attachments[0].text.indexOf('12') !== -1).toBe(true);
+
                 done();
             });
         });
@@ -50,9 +54,12 @@ describe('When calling server with POST /learn', () => {
                 if (error) throw new Error(error);
                 var slackMessage = JSON.parse(response.body);
                 expect(slackMessage.attachments[0].text.indexOf('thing 1') !== -1).toBe(true);
-                expect(slackMessage.attachments[0].text.indexOf('12345') !== -1).toBe(true);
+                expect(slackMessage.attachments[0].text.indexOf('coachone') !== -1).toBe(true);
+                expect(slackMessage.attachments[0].text.indexOf('10') !== -1).toBe(true);
                 expect(slackMessage.attachments[0].text.indexOf('thing 2') !== -1).toBe(false);
+                expect(slackMessage.attachments[0].text.indexOf('11') !== -1).toBe(false);
                 expect(slackMessage.attachments[0].text.indexOf('thing 3') !== -1).toBe(false);
+                expect(slackMessage.attachments[0].text.indexOf('12') !== -1).toBe(false);
                 done();
             });
         });
