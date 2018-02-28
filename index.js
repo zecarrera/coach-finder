@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var seedDB = require("./seeds");
 var Topic = require("./models/topic");
+var Registration = require("./models/registration");
 var MessageFormatter = require("./message-formatter");
 var clientId = process.env.CLIENT_ID;
 var clientSecret = process.env.CLIENT_SECRET;
@@ -68,6 +69,7 @@ app.post('/command', function(req, res) {
 });
 
 app.post('/coach', function(req, res) {
+    console.log("trying to coach");
     let slots = extractTotalSlots(req.body.text);
     var newTopic = {
         coachSlackId: req.body.user_id,
@@ -88,6 +90,7 @@ app.post('/coach', function(req, res) {
 });
 
 app.post('/learn', function(req, res) {
+    console.log("trying to learn");
     topicToLearn = req.body.text;
     if (topicToLearn.toLowerCase() === "everything") {
         Topic.find({}, function(error, foundTopics) {
@@ -117,24 +120,37 @@ app.post('/learn', function(req, res) {
 });
 
 app.post('/registration', function(req, res) {
-    //payload data is properly hitting the endpoint, need now to :
-    //1. create object with topic title, user name and id
-    //2. submit registration
-    //2.1 --1 on the availableSlots
-    //when that is finished, implement the unregistration
-    //then update how the list of topics is built, to:
-    //1 - show when no slots are available
-    //2 - change button text if user is already reigsteerd
-    console.log("registration - user");
     var payload = JSON.parse(req.body.payload);
-    console.log(payload);
-    console.log("actions - topic title");
-    payload.actions.forEach(action => {
-        console.log(action);
-    });
 
+    var topicId = payload.actions[0].value;
     var user = payload.user;
-    console.log(JSON.stringify(user));
+
+    Topic.findById(topicId, function (error, foundTopic) {
+        if (error) {
+            console.log(error);
+        } else {
+            if(foundTopic.availableSlots >0){
+                foundTopic.availableSlots = foundTopic.availableSlots - 1;
+                foundTopic.save();
+                var newRegistration = {
+                    applicantSlackId: user.id,
+                    applicantUsername: user.name,
+                    topicId: topicId
+                };
+                Registration.create(newRegistration, function(error, result) {
+                    if (error) {
+                        console.log(error);
+                        throw "Failed to create registration";
+                    } else {
+                        console.log("registered successfully");
+                        res.send(MessageFormatter.formatSuccessRegistrationMessage(result));
+                    }
+                });
+            }else{
+                res.send(MessageFormatter.formatErrorRegistrationMessage());
+            }
+        }
+    });
 });
 
 function extractTitle(message){
@@ -154,3 +170,11 @@ function getTopics(topicTitle) {
     });
     return query;
 }
+//TODO: do not allow duplicated registration
+//TODO: allow user to drop out
+//TODO: show when no slots are available
+//TODO: change button text if user is already reigsteerd
+//TODO: when joining show topic title instead of id
+//TODO: investigate why success messages show up weirdly
+//TODO: update test coverage
+//TODO: refactor and make things niceer

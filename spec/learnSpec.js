@@ -92,10 +92,11 @@ describe('When calling server with POST /learn', () => {
 
 //TODO: tests to add
 // search for "thing" should bring all topics with "thing" (https://stackoverflow.com/questions/9824010/mongoose-js-find-user-by-username-like-value)
-// search for username should bring all topics coached by that user
 // test with longer list of results to see how it is displayed
-// add behaviour to subscribe to topic when clicking the link, it needs to -1 on the availableSlots and keep track of the users list
-// do not show link if no slots are available
+//registration spec:
+// don't show join button if no slots are availableSlots
+// show button with different text depending if registered or not
+//
 //need something to list who is registered
 // need something to cancel registration
 });

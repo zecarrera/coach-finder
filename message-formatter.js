@@ -16,6 +16,30 @@ class MessageFormatter {
         };
     }
 
+    static formatSuccessRegistrationMessage(registration){
+        return {
+        "attachments": [
+            {
+                "title": "Welcome!",
+                "color": "good",
+                "text": `<@${registration.applicantUsername}> is now registered to attend *${registration.topicId}*`,
+            }
+        ]
+        };
+    }
+
+    static formatErrorRegistrationMessage () {
+        return {
+        "attachments": [
+            {
+                "title": "Sorry, registration failed!",
+                "color": "bad",
+                "text": "send /learn everything to see full list",
+            }
+        ]
+        };
+    }
+
     static formatTopicList (listOfTopicsToPresent) {
         let messageAttachments = [];
         listOfTopicsToPresent.forEach(topic => {
@@ -31,7 +55,7 @@ class MessageFormatter {
                         "name": "toggle-registration",
                         "text": "Join/Drop-out",
                         "type": "button",
-                        "value": topic.topicTitle
+                        "value": topic._id
                     }
                 ]
             };

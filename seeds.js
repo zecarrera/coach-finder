@@ -1,4 +1,5 @@
 var mongoose    = require('mongoose'),
+    Registration= require("./models/registration.js"),
     Topic       = require("./models/topic.js");
 
 function seedDB() {
@@ -17,6 +18,16 @@ function seedDB() {
                 }
             });
         });
+    });
+
+    //Clear all registrations
+    Registration.remove({}, function(err) {
+        if (err) {
+            console.log(err);
+        }
+        else{
+            console.log("cleared registrations");
+        }
     });
 
     //Insert some coach topics
