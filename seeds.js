@@ -4,13 +4,13 @@ var mongoose    = require('mongoose'),
 
 function seedDB() {
     console.log("Started to set up database");
-    //Clear all topics
+    //Clear all topics and add initial set
     Topic.remove({}, function(err) {
         if (err) {
             console.log(err);
         }
-        data.forEach(function(seed) {
-            Topic.create(seed, function(err, addedTopic) {
+        coachTopics.forEach(function(coachTopic) {
+            Topic.create(coachTopic, function(err, addedTopic) {
                 if (err) {
                     console.log(err);
                 } else {
@@ -30,8 +30,8 @@ function seedDB() {
         }
     });
 
-    //Insert some coach topics
-    var data = [{
+    //Initial coachTopics
+    var coachTopics = [{
             coachSlackId: "12345",
             coachUsername: "coachone",
             topicTitle: "thing 1",

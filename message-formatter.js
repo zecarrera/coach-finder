@@ -1,3 +1,5 @@
+let dataAccess = require("./controllers/registration-controller");
+
 class MessageFormatter {
     static formatSuccessMessage(addedTopic){
         return {
@@ -40,25 +42,57 @@ class MessageFormatter {
         };
     }
 
-    static formatTopicList (listOfTopicsToPresent) {
+    static formatTopicList (listOfTopicsToPresent, userId) {
         let messageAttachments = [];
+        let attachment;
         listOfTopicsToPresent.forEach(topic => {
-            let attachment =
-            {
-                "title": topic.topicTitle,
-                "text": "coach: "+"<@" + topic.coachUsername + ">"+ " slots: "+topic.totalSlots,
-                "title_link": "https://coachfindertest.localtunnel.me",
-                "callback_id": "toggle_registration",
-                "color": "good",
-                "actions":[
+            if(userIsRegisteredOnTopic(topic._id, userId)){
+                attachment =
+                {
+                    "title": topic.topicTitle,
+                    "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
+                    "title_link": "https://coachfindertest.localtunnel.me",
+                    "callback_id": "toggle_registration",
+                    "color": "good",
+                    "actions":[
+                        {
+                            "name": "toggle-registration",
+                            "text": "Drop-out",
+                            "type": "button",
+                            "value": topic._id
+                        }
+                    ]
+                };
+            }else{
+                if(topic.availableSlots > 0){
+                    attachment =
                     {
-                        "name": "toggle-registration",
-                        "text": "Join/Drop-out",
-                        "type": "button",
-                        "value": topic._id
-                    }
-                ]
-            };
+                        "title": topic.topicTitle,
+                        "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
+                        "title_link": "https://coachfindertest.localtunnel.me",
+                        "callback_id": "toggle_registration",
+                        "color": "good",
+                        "actions":[
+                            {
+                                "name": "toggle-registration",
+                                "text": "Join",
+                                "type": "button",
+                                "value": topic._id
+                            }
+                        ]
+                    };
+                }else{
+                    attachment =
+                    {
+                        "title": topic.topicTitle,
+                        "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
+                        "title_link": "https://coachfindertest.localtunnel.me",
+                        "callback_id": "toggle_registration",
+                        "color": "bad"
+                    };
+                }
+            }
+
             messageAttachments.push(attachment);
         });
         return {
@@ -83,5 +117,7 @@ class MessageFormatter {
         };
     }
 }
-
+function userIsRegisteredOnTopic(topicId, userId){
+    dataAccess.isUserRegisteredOnTopic(userId, topicId);
+}
 module.exports = MessageFormatter;

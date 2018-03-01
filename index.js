@@ -92,12 +92,13 @@ app.post('/coach', function(req, res) {
 app.post('/learn', function(req, res) {
     console.log("trying to learn");
     topicToLearn = req.body.text;
+    userId = req.body.user_id;
     if (topicToLearn.toLowerCase() === "everything") {
         Topic.find({}, function(error, foundTopics) {
             if (error) {
                 console.log(error);
             } else {
-                var textToSendBack = MessageFormatter.formatTopicList(foundTopics);
+                var textToSendBack = MessageFormatter.formatTopicList(foundTopics, userId);
                 res.send(textToSendBack);
             }
         });
@@ -109,7 +110,7 @@ app.post('/learn', function(req, res) {
             } else {
                 var textToSendBack = "";
                 if(foundTopics.length > 0){
-                    textToSendBack = MessageFormatter.formatTopicList(foundTopics);
+                    textToSendBack = MessageFormatter.formatTopicList(foundTopics, userId);
                 }else{
                     textToSendBack = MessageFormatter.topicNotFound();
                 }
@@ -121,7 +122,6 @@ app.post('/learn', function(req, res) {
 
 app.post('/registration', function(req, res) {
     var payload = JSON.parse(req.body.payload);
-
     var topicId = payload.actions[0].value;
     var user = payload.user;
 
@@ -170,11 +170,3 @@ function getTopics(topicTitle) {
     });
     return query;
 }
-//TODO: do not allow duplicated registration
-//TODO: allow user to drop out
-//TODO: show when no slots are available
-//TODO: change button text if user is already reigsteerd
-//TODO: when joining show topic title instead of id
-//TODO: investigate why success messages show up weirdly
-//TODO: update test coverage
-//TODO: refactor and make things niceer
