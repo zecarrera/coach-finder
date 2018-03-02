@@ -136,6 +136,8 @@ app.post('/registration', function(req, res) {
                         if(error){
                             console.log(error);
                         }else{
+                            foundTopic.availableSlots = foundTopic.availableSlots + 1;
+                            foundTopic.save();
                             console.log("unregistered successfully");
                             res.send(MessageFormatter.formatSuccessDropOutMessage(foundTopic.topicTitle, user.name));
                         }
