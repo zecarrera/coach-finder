@@ -6,7 +6,7 @@ module.exports.getTopicById = function (topicId, next) {
         if (error) {
             console.log(error);
         } else {
-            return foundTopic;
+            next(foundTopic);
         }
     });
 };
@@ -18,10 +18,8 @@ module.exports.isUserRegisteredOnTopic = function (applicantSlackId, topicId, ne
             console.log(error);
         } else {
             if(foundRegistration.length === 1){
-                console.log('foundRegistration');
                 next(true);
             }else{
-                console.log('not found');
                 next(false);
             }
         }

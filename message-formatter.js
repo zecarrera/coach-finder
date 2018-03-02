@@ -30,6 +30,18 @@ class MessageFormatter {
         };
     }
 
+    static formatSuccessDropOutMessage(topicTitle, applicantUsername){
+        return {
+        "attachments": [
+            {
+                "title": "Sorry, to see you go!",
+                "color": "good",
+                "text": `<@${applicantUsername}> is no longer attending *${topicTitle}*`,
+            }
+        ]
+        };
+    }
+
     static formatErrorRegistrationMessage () {
         return {
         "attachments": [

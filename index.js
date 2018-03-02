@@ -7,6 +7,7 @@ var seedDB = require("./seeds");
 var Topic = require("./models/topic");
 var Registration = require("./models/registration");
 var MessageFormatter = require("./message-formatter");
+let dataAccess = require("./controllers/registration-controller");
 var clientId = process.env.CLIENT_ID;
 var clientSecret = process.env.CLIENT_SECRET;
 var app = express();
@@ -128,26 +129,40 @@ app.post('/registration', function(req, res) {
         if (error) {
             console.log(error);
         } else {
-            if(foundTopic.availableSlots >0){
-                foundTopic.availableSlots = foundTopic.availableSlots - 1;
-                foundTopic.save();
-                var newRegistration = {
-                    applicantSlackId: user.id,
-                    applicantUsername: user.name,
-                    topicId: topicId
-                };
-                Registration.create(newRegistration, function(error, result) {
-                    if (error) {
-                        console.log(error);
-                        throw "Failed to create registration";
-                    } else {
-                        console.log("registered successfully");
-                        res.send(MessageFormatter.formatSuccessRegistrationMessage(foundTopic.topicTitle, user.name));
+            dataAccess.isUserRegisteredOnTopic(user.id, topicId, function(isRegistered){
+                if(isRegistered){
+                    let object = { topicId: topicId, applicantSlackId: user.id};
+                    Registration.remove(object, function(error){
+                        if(error){
+                            console.log(error);
+                        }else{
+                            console.log("unregistered successfully");
+                            res.send(MessageFormatter.formatSuccessDropOutMessage(foundTopic.topicTitle, user.name));
+                        }
+                    });
+                }else{
+                    if(foundTopic.availableSlots >0){
+                        foundTopic.availableSlots = foundTopic.availableSlots - 1;
+                        foundTopic.save();
+                        var newRegistration = {
+                            applicantSlackId: user.id,
+                            applicantUsername: user.name,
+                            topicId: topicId
+                        };
+                        Registration.create(newRegistration, function(error, result) {
+                            if (error) {
+                                console.log(error);
+                                throw "Failed to create registration";
+                            } else {
+                                console.log("registered successfully");
+                                res.send(MessageFormatter.formatSuccessRegistrationMessage(foundTopic.topicTitle, user.name));
+                            }
+                        });
+                    }else{
+                        res.send(MessageFormatter.formatErrorRegistrationMessage());
                     }
-                });
-            }else{
-                res.send(MessageFormatter.formatErrorRegistrationMessage());
-            }
+                }
+            })
         }
     });
 });
