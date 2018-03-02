@@ -69,7 +69,6 @@ app.post('/command', function(req, res) {
 });
 
 app.post('/coach', function(req, res) {
-    console.log("trying to coach");
     let slots = extractTotalSlots(req.body.text);
     var newTopic = {
         coachSlackId: req.body.user_id,
@@ -90,7 +89,6 @@ app.post('/coach', function(req, res) {
 });
 
 app.post('/learn', function(req, res) {
-    console.log("trying to learn");
     topicToLearn = req.body.text;
     userId = req.body.user_id;
     if (topicToLearn.toLowerCase() === "everything") {
@@ -98,8 +96,9 @@ app.post('/learn', function(req, res) {
             if (error) {
                 console.log(error);
             } else {
-                var textToSendBack = MessageFormatter.formatTopicList(foundTopics, userId);
-                res.send(textToSendBack);
+                MessageFormatter.formatTopicList(foundTopics, userId, function(textToSendBack){
+                    res.send(textToSendBack);
+                });
             }
         });
     } else {

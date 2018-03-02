@@ -42,29 +42,12 @@ class MessageFormatter {
         };
     }
 
-    static formatTopicList (listOfTopicsToPresent, userId) {
+    static formatTopicList (listOfTopicsToPresent, userId, callback) {
         let messageAttachments = [];
         let attachment;
         listOfTopicsToPresent.forEach(topic => {
-            if(userIsRegisteredOnTopic(topic._id, userId)){
-                attachment =
-                {
-                    "title": topic.topicTitle,
-                    "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
-                    "title_link": "https://coachfindertest.localtunnel.me",
-                    "callback_id": "toggle_registration",
-                    "color": "good",
-                    "actions":[
-                        {
-                            "name": "toggle-registration",
-                            "text": "Drop-out",
-                            "type": "button",
-                            "value": topic._id
-                        }
-                    ]
-                };
-            }else{
-                if(topic.availableSlots > 0){
+            dataAccess.isUserRegisteredOnTopic(userId, topic._id, function(isRegistered){
+                if(isRegistered){
                     attachment =
                     {
                         "title": topic.topicTitle,
@@ -75,30 +58,51 @@ class MessageFormatter {
                         "actions":[
                             {
                                 "name": "toggle-registration",
-                                "text": "Join",
+                                "text": "Drop-out",
                                 "type": "button",
                                 "value": topic._id
                             }
                         ]
                     };
                 }else{
-                    attachment =
-                    {
-                        "title": topic.topicTitle,
-                        "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
-                        "title_link": "https://coachfindertest.localtunnel.me",
-                        "callback_id": "toggle_registration",
-                        "color": "bad"
-                    };
+                    if(topic.availableSlots > 0){
+                        attachment =
+                        {
+                            "title": topic.topicTitle,
+                            "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
+                            "title_link": "https://coachfindertest.localtunnel.me",
+                            "callback_id": "toggle_registration",
+                            "color": "good",
+                            "actions":[
+                                {
+                                    "name": "toggle-registration",
+                                    "text": "Join",
+                                    "type": "button",
+                                    "value": topic._id
+                                }
+                            ]
+                        };
+                    }else{
+                        attachment =
+                        {
+                            "title": topic.topicTitle,
+                            "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
+                            "title_link": "https://coachfindertest.localtunnel.me",
+                            "callback_id": "toggle_registration",
+                            "color": "bad"
+                        };
+                    }
                 }
-            }
-
-            messageAttachments.push(attachment);
+                messageAttachments.push(attachment);
+                if(messageAttachments.length === listOfTopicsToPresent.length){
+                    let fullMessage= {
+                        "text": "Full List of Topics \n _click link to view details_",
+                        "attachments": messageAttachments
+                    };
+                    callback(fullMessage);
+                }
+            });
         });
-        return {
-            "text": "Full List of Topics \n _click link to view details_",
-            "attachments": messageAttachments
-        };
     }
 
     static topicNotFound () {
@@ -117,7 +121,5 @@ class MessageFormatter {
         };
     }
 }
-function userIsRegisteredOnTopic(topicId, userId){
-    dataAccess.isUserRegisteredOnTopic(userId, topicId);
-}
+
 module.exports = MessageFormatter;

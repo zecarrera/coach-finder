@@ -15,9 +15,15 @@ module.exports.isUserRegisteredOnTopic = function (applicantSlackId, topicId, ne
     let object = { topicId: topicId, applicantSlackId: applicantSlackId};
     Registration.find(object, function (error, foundRegistration) {
         if (error) {
-            return false;
+            console.log(error);
         } else {
-            return true;
+            if(foundRegistration.length === 1){
+                console.log('foundRegistration');
+                next(true);
+            }else{
+                console.log('not found');
+                next(false);
+            }
         }
     });
 };
