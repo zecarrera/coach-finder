@@ -143,7 +143,7 @@ app.post('/registration', function(req, res) {
                         throw "Failed to create registration";
                     } else {
                         console.log("registered successfully");
-                        res.send(MessageFormatter.formatSuccessRegistrationMessage(result));
+                        res.send(MessageFormatter.formatSuccessRegistrationMessage(foundTopic.topicTitle, user.name));
                     }
                 });
             }else{

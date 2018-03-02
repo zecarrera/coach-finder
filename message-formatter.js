@@ -18,13 +18,13 @@ class MessageFormatter {
         };
     }
 
-    static formatSuccessRegistrationMessage(registration){
+    static formatSuccessRegistrationMessage(topicTitle, applicantUsername){
         return {
         "attachments": [
             {
                 "title": "Welcome!",
                 "color": "good",
-                "text": `<@${registration.applicantUsername}> is now registered to attend *${registration.topicId}*`,
+                "text": `<@${applicantUsername}> is now registered to attend *${topicTitle}*`,
             }
         ]
         };
