@@ -64,7 +64,7 @@ class MessageFormatter {
                     {
                         "title": topic.topicTitle,
                         "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
-                        "title_link": "https://coachfindertest.localtunnel.me",
+                        "title_link": "https://testcoachfinder.localtunnel.me/participants/"+topic._id,
                         "callback_id": "toggle_registration",
                         "color": "good",
                         "actions":[
@@ -82,7 +82,7 @@ class MessageFormatter {
                         {
                             "title": topic.topicTitle,
                             "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
-                            "title_link": "https://coachfindertest.localtunnel.me",
+                            "title_link": "https://testcoachfinder.localtunnel.me/participants/"+topic._id,
                             "callback_id": "toggle_registration",
                             "color": "good",
                             "actions":[
@@ -99,7 +99,7 @@ class MessageFormatter {
                         {
                             "title": topic.topicTitle,
                             "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
-                            "title_link": "https://coachfindertest.localtunnel.me",
+                            "title_link": "https://testcoachfinder.localtunnel.me/participants/"+topic._id,
                             "callback_id": "toggle_registration",
                             "color": "bad"
                         };

@@ -29,7 +29,6 @@ app.listen(PORT, function() {
     console.log("Coach Finder listening on port " + PORT);
 });
 
-// This route handles GET requests to our root ngrok address and responds with the same "Ngrok is working message" we used before
 app.get('/', function(req, res) {
     res.send('Local tunnel is working! Path Hit: ' + req.url);
 });
@@ -118,6 +117,21 @@ app.post('/learn', function(req, res) {
             }
         });
     }
+});
+
+app.get('/participants/:id', function(req, res) {
+    var requestedTopicId = mongoose.Types.ObjectId(req.params.id);
+    Registration.find({topicId: requestedTopicId}, function(error, registeredParticipants) {
+        if (error) {
+            console.log(error);
+        } else {
+            listOfParticipants = [];
+            registeredParticipants.forEach(participant => {
+                listOfParticipants.push("@"+participant.applicantUsername);
+            });
+            res.send(JSON.stringify(listOfParticipants));
+        }
+    });
 });
 
 app.post('/registration', function(req, res) {
