@@ -16,10 +16,12 @@ mongoose.connect("mongodb://localhost/coach_finder", {
     useMongoClient: true
 });
 
+app.set("view engine", "ejs");
+
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-seedDB();
+// seedDB();
 
 const PORT = 3131;
 
@@ -129,7 +131,8 @@ app.get('/participants/:id', function(req, res) {
             registeredParticipants.forEach(participant => {
                 listOfParticipants.push("@"+participant.applicantUsername);
             });
-            res.send(JSON.stringify(listOfParticipants));
+            // res.send(JSON.stringify(listOfParticipants));
+            res.render('registrations/show', {data:registeredParticipants});
         }
     });
 });
