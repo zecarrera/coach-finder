@@ -1,4 +1,4 @@
-let dataAccess = require("./controllers/registration-controller");
+let dataAccess = require("./data-manager/data-access");
 
 class MessageFormatter {
     static formatSuccessMessage(addedTopic){

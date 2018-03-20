@@ -1,16 +1,16 @@
-var http = require('http');
-var express = require('express');
-var request = require('request');
-var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
-var seedDB = require("./seeds");
-var Topic = require("./models/topic");
-var Registration = require("./models/registration");
-var MessageFormatter = require("./message-formatter");
-let dataAccess = require("./controllers/registration-controller");
-var clientId = process.env.CLIENT_ID;
-var clientSecret = process.env.CLIENT_SECRET;
-var app = express();
+let http = require('http');
+let express = require('express');
+let request = require('request');
+let bodyParser = require('body-parser');
+let mongoose = require('mongoose');
+let seedDB = require("./seeds");
+let Topic = require("./models/topic");
+let Registration = require("./models/registration");
+let MessageFormatter = require("./message-formatter");
+let dataAccess = require("./data-manager/data-access");
+let clientId = process.env.CLIENT_ID;
+let clientSecret = process.env.CLIENT_SECRET;
+let app = express();
 
 mongoose.connect("mongodb://localhost/coach_finder", {
     useMongoClient: true
@@ -65,14 +65,10 @@ app.get('/oauth', function(req, res) {
     }
 });
 
-// Route the endpoint that our slash command will point to and send back a simple response to indicate that ngrok is working
-app.post('/command', function(req, res) {
-    res.send('Your local tunnel is up and running!');
-});
 
 app.post('/coach', function(req, res) {
     let slots = extractTotalSlots(req.body.text);
-    var newTopic = {
+    let newTopic = {
         coachSlackId: req.body.user_id,
         coachUsername: req.body.user_name,
         topicTitle: extractTitle(req.body.text),
@@ -142,9 +138,9 @@ app.get('/participants/:id', function(req, res) {
 });
 
 app.post('/registration', function(req, res) {
-    var payload = JSON.parse(req.body.payload);
-    var topicId = payload.actions[0].value;
-    var user = payload.user;
+    let payload = JSON.parse(req.body.payload);
+    let topicId = payload.actions[0].value;
+    let user = payload.user;
 
     Topic.findById(topicId, function (error, foundTopic) {
         if (error) {
@@ -185,25 +181,25 @@ app.post('/registration', function(req, res) {
                         res.send(MessageFormatter.formatErrorRegistrationMessage());
                     }
                 }
-            })
+            });
         }
     });
 });
 
-function extractTitle(message){
+extractTitle = (message) => {
     let endIndex = message.indexOf("with") -1;
     return message.substring(0, endIndex);
-}
+};
 
-function extractTotalSlots(message){
+extractTotalSlots = (message) => {
     let startIndex = message.indexOf("with") + 4;
     let endIndex = message.indexOf("slots");
     return Number(message.substring(startIndex, endIndex));
-}
+};
 
-function getTopics(topicTitle) {
-    var query = Topic.find({
+getTopics = (topicTitle) => {
+    let query = Topic.find({
         topicTitle: topicTitle
     });
     return query;
-}
+};
