@@ -8,11 +8,7 @@ class MessageFormatter {
                 "title": "WOW, Nice job!",
                 "pretext": "Coach topics _updated_",
                 "color": "good",
-                "text": `<@${addedTopic.coachSlackId}> is now listed as coach for *${addedTopic.topicTitle}* with *${addedTopic.totalSlots}* slots`,
-                "mrkdwn_in": [
-                    "text",
-                    "pretext"
-                ]
+                "text": `<@${addedTopic.coachSlackId}> is now listed as coach for *${addedTopic.topicTitle}* with *${addedTopic.totalSlots}* slots`
             }
         ]
         };
@@ -24,7 +20,7 @@ class MessageFormatter {
             {
                 "title": "Welcome!",
                 "color": "good",
-                "text": `<@${applicantUsername}> is now registered to attend *${topicTitle}*`,
+                "text": `<@${applicantUsername}> is now registered to attend *${topicTitle}*`
             }
         ]
         };
@@ -36,7 +32,7 @@ class MessageFormatter {
             {
                 "title": "Sorry, to see you go!",
                 "color": "good",
-                "text": `<@${applicantUsername}> is no longer attending *${topicTitle}*`,
+                "text": `<@${applicantUsername}> is no longer attending *${topicTitle}*`
             }
         ]
         };
@@ -47,8 +43,8 @@ class MessageFormatter {
         "attachments": [
             {
                 "title": "Sorry, registration failed!",
-                "color": "bad",
-                "text": "send /learn everything to see full list",
+                "color": "danger",
+                "text": "send /learn everything to see full list"
             }
         ]
         };
@@ -63,7 +59,7 @@ class MessageFormatter {
                     attachment =
                     {
                         "title": topic.topicTitle,
-                        "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
+                        "text": "*coach:* "+"<@" + topic.coachUsername + ">"+ " \n*available slots:* "+topic.availableSlots,
                         "title_link": "https://testcoachfinder.localtunnel.me/participants/"+topic._id,
                         "callback_id": "toggle_registration",
                         "color": "good",
@@ -81,7 +77,7 @@ class MessageFormatter {
                         attachment =
                         {
                             "title": topic.topicTitle,
-                            "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
+                            "text": "*coach:* "+"<@" + topic.coachUsername + ">"+ " \n*available slots:* "+topic.availableSlots,
                             "title_link": "https://testcoachfinder.localtunnel.me/participants/"+topic._id,
                             "callback_id": "toggle_registration",
                             "color": "good",
@@ -98,7 +94,7 @@ class MessageFormatter {
                         attachment =
                         {
                             "title": topic.topicTitle,
-                            "text": "coach: "+"<@" + topic.coachUsername + ">"+ " available slots: "+topic.availableSlots,
+                            "text": "*coach:* "+"<@" + topic.coachUsername + ">"+ " \n*available slots:* "+topic.availableSlots,
                             "title_link": "https://testcoachfinder.localtunnel.me/participants/"+topic._id,
                             "callback_id": "toggle_registration",
                             "color": "bad"
@@ -122,12 +118,8 @@ class MessageFormatter {
         "attachments": [
             {
                 "title": "Topic not found",
-                "color": "bad",
-                "text": "send /learn everything to see full list",
-                "mrkdwn_in": [
-                    "text",
-                    "pretext"
-                ]
+                "color": "warning",
+                "text": "send /learn everything to see full list"
             }
         ]
         };
