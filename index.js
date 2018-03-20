@@ -122,17 +122,21 @@ app.post('/learn', function(req, res) {
 });
 
 app.get('/participants/:id', function(req, res) {
-    var requestedTopicId = mongoose.Types.ObjectId(req.params.id);
-    Registration.find({topicId: requestedTopicId}, function(error, registeredParticipants) {
+    let requestedTopicId = mongoose.Types.ObjectId(req.params.id);
+    let topicTitle;
+    Topic.findById(requestedTopicId, function(error, foundTopic){
         if (error) {
             console.log(error);
+            res.status(404).send('Not found');
         } else {
-            listOfParticipants = [];
-            registeredParticipants.forEach(participant => {
-                listOfParticipants.push("@"+participant.applicantUsername);
+            Registration.find({topicId: requestedTopicId}, function(error, registeredParticipants) {
+                if (error) {
+                    console.log(error);
+                    res.status(404).send('Not found');
+                } else {
+                    res.render('registrations/show', {participants:registeredParticipants, topic: foundTopic});
+                }
             });
-            // res.send(JSON.stringify(listOfParticipants));
-            res.render('registrations/show', {data:registeredParticipants});
         }
     });
 });

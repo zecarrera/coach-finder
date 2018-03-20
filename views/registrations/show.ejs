@@ -1,18 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CoachFinder</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+
+<body>
     <div class="container">
         <div class="row">
             <div class="col-md-3">
-                <p class="lead">Topic: GetTopicTitle</p>
+                <p class="lead">Topic: <%= topic.topicTitle %></p>
                 <div class="list-group">
-                        <% data.forEach(function(participant){ %>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <ol><%= participant.applicantUsername %></ol>
-                                </div>
+                    <ol>
+
+                    <% participants.forEach(function(participant){ %>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <li>
+                                    <%= participant.applicantUsername %>
+                                </li>
                             </div>
-                            <% }); %>
+                        </div>
+                        <% }); %>
+                    </ol>
+
                 </div>
             </div>
 
         </div>
     </div>
     <br><a href="/">See topic detailed info</a>
+</body>
+</html>
