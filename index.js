@@ -137,52 +137,27 @@ app.get('/participants/:id', function(req, res) {
     });
 });
 
-app.post('/registration', function(req, res) {
+app.post('/registration', function (req, res) {
     let payload = JSON.parse(req.body.payload);
     let topicId = payload.actions[0].value;
     let user = payload.user;
 
-    Topic.findById(topicId, function (error, foundTopic) {
-        if (error) {
-            console.log(error);
-        } else {
-            dataAccess.isUserRegisteredOnTopic(user.id, topicId, function(isRegistered){
-                if(isRegistered){
-                    let object = { topicId: topicId, applicantSlackId: user.id};
-                    Registration.remove(object, function(error){
-                        if(error){
-                            console.log(error);
-                        }else{
-                            foundTopic.availableSlots = foundTopic.availableSlots + 1;
-                            foundTopic.save();
-                            console.log("unregistered successfully");
-                            res.send(MessageFormatter.formatSuccessDropOutMessage(foundTopic.topicTitle, user.name));
-                        }
+    dataAccess.findById(Topic, topicId, (foundTopic) => {
+        dataAccess.isUserRegisteredOnTopic(user.id, topicId, (isAlreadyRegistered) => {
+            if (isAlreadyRegistered) {
+                deleteRegistration(topicId, user, foundTopic, (successDropOutMessage) => {
+                    res.send(successDropOutMessage);
+                });
+            } else {
+                if (foundTopic.availableSlots > 0) {
+                    createRegistration(foundTopic, user, topicId, (successRegistrationMessage) => {
+                        res.send(successRegistrationMessage);
                     });
-                }else{
-                    if(foundTopic.availableSlots >0){
-                        foundTopic.availableSlots = foundTopic.availableSlots - 1;
-                        foundTopic.save();
-                        var newRegistration = {
-                            applicantSlackId: user.id,
-                            applicantUsername: user.name,
-                            topicId: topicId
-                        };
-                        Registration.create(newRegistration, function(error, result) {
-                            if (error) {
-                                console.log(error);
-                                throw "Failed to create registration";
-                            } else {
-                                console.log("registered successfully");
-                                res.send(MessageFormatter.formatSuccessRegistrationMessage(foundTopic.topicTitle, user.name));
-                            }
-                        });
-                    }else{
-                        res.send(MessageFormatter.formatErrorRegistrationMessage());
-                    }
+                } else {
+                    res.send(MessageFormatter.formatErrorRegistrationMessage());
                 }
-            });
-        }
+            }
+        });
     });
 });
 
@@ -203,3 +178,43 @@ getTopics = (topicTitle) => {
     });
     return query;
 };
+
+deleteRegistration = (topicId, user, foundTopic, callback) => {
+    let registrationToDelete = { topicId: topicId, applicantSlackId: user.id };
+    dataAccess.delete(Registration, registrationToDelete, (isDeleted) =>{
+        if(isDeleted){
+            foundTopic.availableSlots = foundTopic.availableSlots + 1;
+            foundTopic.save();
+            console.log("unregistered successfully");
+            let successMessage = MessageFormatter.formatSuccessDropOutMessage(foundTopic.topicTitle, user.name);
+            callback(successMessage);
+        }else{
+            console.log("an error happened while trying to delete registration");
+        }
+    })
+}
+
+createRegistration = (foundTopic, user, topicId, callback) => {
+    let newRegistration = {
+        applicantSlackId: user.id,
+        applicantUsername: user.name,
+        topicId: topicId
+    };
+    decrementAvailableSlots(foundTopic, () =>{
+        dataAccess.insert(Registration, newRegistration, (createdRegistration) => {
+            if (createdRegistration){
+                let successMessage = MessageFormatter.formatSuccessRegistrationMessage(foundTopic.topicTitle, createdRegistration.applicantUsername);
+                callback(successMessage);
+            }else{
+                console.log("Failed to create registration");
+            }
+        })
+    });
+}
+
+decrementAvailableSlots = (foundTopic, callback) => {
+    foundTopic.availableSlots = foundTopic.availableSlots - 1;
+    foundTopic.save();
+    callback();
+}
+
