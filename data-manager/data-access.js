@@ -17,7 +17,7 @@ module.exports.isUserRegisteredOnTopic = (applicantSlackId, topicId, next) => {
 };
 
 module.exports.delete = (model, objectToDelete, next) => {
-    model.remove(objectToDelete, function (error) {
+    model.remove(objectToDelete,  (error) => {
         if (error) {
             console.log(error);
             next(false);
@@ -28,7 +28,7 @@ module.exports.delete = (model, objectToDelete, next) => {
 };
 
 module.exports.insert = (model, objectToInsert, next) => {
-    model.create(objectToInsert, function (error, result) {
+    model.create(objectToInsert,  (error, result) => {
         if (error) {
             console.log(error);
         } else {
@@ -39,7 +39,7 @@ module.exports.insert = (model, objectToInsert, next) => {
 };
 
 module.exports.findById = (model, objectId, next) => {
-    model.findById(objectId, function (error, foundEntry) {
+    model.findById(objectId,  (error, foundEntry) => {
         if(error){
             console.log(error);
         }else{
@@ -48,8 +48,18 @@ module.exports.findById = (model, objectId, next) => {
     });
 };
 
+module.exports.findTopic = (topic, next) => {
+    Topic.find(topic,  (error, foundTopic) => {
+        if (error) {
+            console.log(error);
+        } else {
+            next(foundTopic);
+        }
+    });
+};
+
 module.exports.findRegistrationByTopicId = (searchTopic, next) => {
-    Registration.find(searchTopic, function (error, registeredParticipants) {
+    Registration.find(searchTopic,  (error, registeredParticipants) => {
         if (error) {
             console.log(error);
         } else {

@@ -25,18 +25,13 @@ app.use(bodyParser.urlencoded({
 
 const PORT = 3131;
 
-// Lets start our server
-app.listen(PORT, function() {
+app.listen(PORT, () => {
     //Callback triggered when server is successfully listening. Hurray!
     console.log("Coach Finder listening on port " + PORT);
 });
 
-app.get('/', function(req, res) {
-    res.send('Local tunnel is working! Path Hit: ' + req.url);
-});
-
 // This route handles get request to a /oauth endpoint. We'll use this endpoint for handling the logic of the Slack oAuth process behind our app.
-app.get('/oauth', function(req, res) {
+app.get('/oauth', (req, res) => {
     // When a user authorizes an app, a code query parameter is passed on the oAuth endpoint. If that code is not there, we respond with an error message
     if (!req.query.code) {
         res.status(500);
@@ -54,8 +49,7 @@ app.get('/oauth', function(req, res) {
                 client_secret: clientSecret
             }, //Query string data
             method: 'GET',
-
-        }, function(error, response, body) {
+        }, (error, response, body) => {
             if (error) {
                 console.log(error);
             } else {
@@ -65,8 +59,7 @@ app.get('/oauth', function(req, res) {
     }
 });
 
-
-app.post('/coach', function(req, res) {
+app.post('/coach', (req, res) => {
     let slots = extractTotalSlots(req.body.text);
     let newTopic = {
         coachSlackId: req.body.user_id,
@@ -75,37 +68,40 @@ app.post('/coach', function(req, res) {
         totalSlots: slots,
         availableSlots: slots
     };
-    Topic.create(newTopic, function(error, result) {
-        if (error) {
+
+    dataAccess.insert(Topic, newTopic, (result) =>{
+        if (!result) {
             console.log(error);
         } else {
             console.log("Topic created");
             res.send(MessageFormatter.formatSuccessMessage(result));
         }
     });
-
 });
 
-app.post('/learn', function(req, res) {
-    topicToLearn = req.body.text;
-    userId = req.body.user_id;
+app.post('/learn', (req, res) => {
+    let topicToLearn = req.body.text;
+    let userId = req.body.user_id;
+
     if (topicToLearn.toLowerCase() === "everything") {
-        Topic.find({}, function(error, foundTopics) {
-            if (error) {
+        dataAccess.findTopic({}, (foundTopics) => {
+            if (!foundTopics) {
                 console.log(error);
             } else {
-                MessageFormatter.formatTopicList(foundTopics, userId, function(textToSendBack){
+                MessageFormatter.formatTopicList(foundTopics, userId, (textToSendBack) => {
                     res.send(textToSendBack);
                 });
             }
         });
     } else {
-        var query = getTopics(topicToLearn);
-        query.exec(function(err, foundTopics) {
+        let query = Topic.find({
+            topicTitle: topicToLearn
+        });
+        query.exec((err, foundTopics) => {
             if (err) {
                 return console.log(err);
             } else {
-                var textToSendBack = "";
+                let textToSendBack = "";
                 if(foundTopics.length > 0){
                     textToSendBack = MessageFormatter.formatTopicList(foundTopics, userId);
                 }else{
@@ -117,15 +113,16 @@ app.post('/learn', function(req, res) {
     }
 });
 
-app.get('/participants/:id', function(req, res) {
+app.get('/participants/:id', (req, res) => {
     let requestedTopicId = mongoose.Types.ObjectId(req.params.id);
     let topicTitle;
-    dataAccess.findById(Topic, requestedTopicId, function(foundTopic){
+
+    dataAccess.findById(Topic, requestedTopicId, (foundTopic) => {
         if (!foundTopic) {
             console.log(error);
             res.status(404).send('Not found');
         } else {
-            dataAccess.findRegistrationByTopicId({topicId: requestedTopicId}, function(registeredParticipants) {
+            dataAccess.findRegistrationByTopicId({topicId: requestedTopicId}, (registeredParticipants) => {
                 if (!registeredParticipants) {
                     console.log(error);
                     res.status(404).send('Not found');
@@ -137,7 +134,7 @@ app.get('/participants/:id', function(req, res) {
     });
 });
 
-app.post('/registration', function (req, res) {
+app.post('/registration', (req, res) => {
     let payload = JSON.parse(req.body.payload);
     let topicId = payload.actions[0].value;
     let user = payload.user;
@@ -170,13 +167,6 @@ extractTotalSlots = (message) => {
     let startIndex = message.indexOf("with") + 4;
     let endIndex = message.indexOf("slots");
     return Number(message.substring(startIndex, endIndex));
-};
-
-getTopics = (topicTitle) => {
-    let query = Topic.find({
-        topicTitle: topicTitle
-    });
-    return query;
 };
 
 deleteRegistration = (topicId, user, foundTopic, callback) => {
