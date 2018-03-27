@@ -120,13 +120,13 @@ app.post('/learn', function(req, res) {
 app.get('/participants/:id', function(req, res) {
     let requestedTopicId = mongoose.Types.ObjectId(req.params.id);
     let topicTitle;
-    Topic.findById(requestedTopicId, function(error, foundTopic){
-        if (error) {
+    dataAccess.findById(Topic, requestedTopicId, function(foundTopic){
+        if (!foundTopic) {
             console.log(error);
             res.status(404).send('Not found');
         } else {
-            Registration.find({topicId: requestedTopicId}, function(error, registeredParticipants) {
-                if (error) {
+            dataAccess.findRegistrationByTopicId({topicId: requestedTopicId}, function(registeredParticipants) {
+                if (!registeredParticipants) {
                     console.log(error);
                     res.status(404).send('Not found');
                 } else {

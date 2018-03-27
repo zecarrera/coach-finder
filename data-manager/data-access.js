@@ -48,3 +48,12 @@ module.exports.findById = (model, objectId, next) => {
     });
 };
 
+module.exports.findRegistrationByTopicId = (searchTopic, next) => {
+    Registration.find(searchTopic, function (error, registeredParticipants) {
+        if (error) {
+            console.log(error);
+        } else {
+            next(registeredParticipants);
+        }
+    });
+};
