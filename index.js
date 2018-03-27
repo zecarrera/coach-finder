@@ -7,6 +7,7 @@ let seedDB = require("./seeds");
 let Topic = require("./models/topic");
 let Registration = require("./models/registration");
 let MessageFormatter = require("./message-formatter");
+let RegistrationController = require("./controllers/registration-controller");
 let dataAccess = require("./data-manager/data-access");
 let clientId = process.env.CLIENT_ID;
 let clientSecret = process.env.CLIENT_SECRET;
@@ -138,16 +139,16 @@ app.post('/registration', (req, res) => {
     let payload = JSON.parse(req.body.payload);
     let topicId = payload.actions[0].value;
     let user = payload.user;
-
+    
     dataAccess.findById(Topic, topicId, (foundTopic) => {
         dataAccess.isUserRegisteredOnTopic(user.id, topicId, (isAlreadyRegistered) => {
             if (isAlreadyRegistered) {
-                deleteRegistration(topicId, user, foundTopic, (successDropOutMessage) => {
+                RegistrationController.deleteRegistration(topicId, user, foundTopic, (successDropOutMessage) => {
                     res.send(successDropOutMessage);
                 });
             } else {
                 if (foundTopic.availableSlots > 0) {
-                    createRegistration(foundTopic, user, topicId, (successRegistrationMessage) => {
+                    RegistrationController.createRegistration(foundTopic, user, topicId, (successRegistrationMessage) => {
                         res.send(successRegistrationMessage);
                     });
                 } else {
@@ -168,43 +169,4 @@ extractTotalSlots = (message) => {
     let endIndex = message.indexOf("slots");
     return Number(message.substring(startIndex, endIndex));
 };
-
-deleteRegistration = (topicId, user, foundTopic, callback) => {
-    let registrationToDelete = { topicId: topicId, applicantSlackId: user.id };
-    dataAccess.delete(Registration, registrationToDelete, (isDeleted) =>{
-        if(isDeleted){
-            foundTopic.availableSlots = foundTopic.availableSlots + 1;
-            foundTopic.save();
-            console.log("unregistered successfully");
-            let successMessage = MessageFormatter.formatSuccessDropOutMessage(foundTopic.topicTitle, user.name);
-            callback(successMessage);
-        }else{
-            console.log("an error happened while trying to delete registration");
-        }
-    })
-}
-
-createRegistration = (foundTopic, user, topicId, callback) => {
-    let newRegistration = {
-        applicantSlackId: user.id,
-        applicantUsername: user.name,
-        topicId: topicId
-    };
-    decrementAvailableSlots(foundTopic, () =>{
-        dataAccess.insert(Registration, newRegistration, (createdRegistration) => {
-            if (createdRegistration){
-                let successMessage = MessageFormatter.formatSuccessRegistrationMessage(foundTopic.topicTitle, createdRegistration.applicantUsername);
-                callback(successMessage);
-            }else{
-                console.log("Failed to create registration");
-            }
-        })
-    });
-}
-
-decrementAvailableSlots = (foundTopic, callback) => {
-    foundTopic.availableSlots = foundTopic.availableSlots - 1;
-    foundTopic.save();
-    callback();
-}
 
