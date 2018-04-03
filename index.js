@@ -22,7 +22,7 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-// seedDB();
+seedDB();
 
 const PORT = 3131;
 
