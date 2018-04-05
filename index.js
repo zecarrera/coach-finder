@@ -8,6 +8,7 @@ let Topic = require("./models/topic");
 let Registration = require("./models/registration");
 let MessageFormatter = require("./message-formatter");
 let RegistrationController = require("./controllers/registration-controller");
+let LearnController = require("./controllers/learn-controller");
 let dataAccess = require("./data-manager/data-access");
 let clientId = process.env.CLIENT_ID;
 let clientSecret = process.env.CLIENT_SECRET;
@@ -27,7 +28,6 @@ seedDB();
 const PORT = 3131;
 
 app.listen(PORT, () => {
-    //Callback triggered when server is successfully listening. Hurray!
     console.log("Coach Finder listening on port " + PORT);
 });
 
@@ -43,12 +43,12 @@ app.get('/oauth', (req, res) => {
     } else {
         // We'll do a GET call to Slack's `oauth.access` endpoint, passing our app's client ID, client secret, and the code we just got as query parameters.
         request({
-            url: 'https://slack.com/api/oauth.access', //URL to hit
+            url: 'https://slack.com/api/oauth.access',
             qs: {
                 code: req.query.code,
                 client_id: clientId,
                 client_secret: clientSecret
-            }, //Query string data
+            },
             method: 'GET',
         }, (error, response, body) => {
             if (error) {
@@ -85,31 +85,12 @@ app.post('/learn', (req, res) => {
     let userId = req.body.user_id;
 
     if (topicToLearn.toLowerCase() === "everything") {
-        dataAccess.findTopic({}, (foundTopics) => {
-            if (!foundTopics) {
-                console.log(error);
-            } else {
-                MessageFormatter.formatTopicList(foundTopics, userId, (textToSendBack) => {
-                    res.send(textToSendBack);
-                });
-            }
+        LearnController.presentAllTopics(userId, (topicListToPresent) => {
+            res.send(topicListToPresent);
         });
     } else {
-        let query = Topic.find({
-            topicTitle: topicToLearn
-        });
-        query.exec((err, foundTopics) => {
-            if (err) {
-                return console.log(err);
-            } else {
-                let textToSendBack = "";
-                if(foundTopics.length > 0){
-                    textToSendBack = MessageFormatter.formatTopicList(foundTopics, userId);
-                }else{
-                    textToSendBack = MessageFormatter.topicNotFound();
-                }
-                res.send(textToSendBack);
-            }
+        LearnController.searchGivenTopic(topicToLearn, userId, (topicListToPresent) => {
+            res.send(topicListToPresent);
         });
     }
 });
@@ -139,7 +120,7 @@ app.post('/registration', (req, res) => {
     let payload = JSON.parse(req.body.payload);
     let topicId = payload.actions[0].value;
     let user = payload.user;
-    
+    //refactor: controller should have method isAlreadyRegistered... then this post just calls the isalreadyregistered and then
     dataAccess.findById(Topic, topicId, (foundTopic) => {
         dataAccess.isUserRegisteredOnTopic(user.id, topicId, (isAlreadyRegistered) => {
             if (isAlreadyRegistered) {

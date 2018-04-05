@@ -113,8 +113,8 @@ class MessageFormatter {
         });
     }
 
-    static topicNotFound () {
-        return {
+    static topicNotFound (callback) {
+        let message= {
         "attachments": [
             {
                 "title": "Topic not found",
@@ -123,6 +123,7 @@ class MessageFormatter {
             }
         ]
         };
+        callback(message);
     }
 }
 
