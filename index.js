@@ -120,23 +120,17 @@ app.post('/registration', (req, res) => {
     let payload = JSON.parse(req.body.payload);
     let topicId = payload.actions[0].value;
     let user = payload.user;
-    //refactor: controller should have method isAlreadyRegistered... then this post just calls the isalreadyregistered and then
-    dataAccess.findById(Topic, topicId, (foundTopic) => {
-        dataAccess.isUserRegisteredOnTopic(user.id, topicId, (isAlreadyRegistered) => {
-            if (isAlreadyRegistered) {
-                RegistrationController.deleteRegistration(topicId, user, foundTopic, (successDropOutMessage) => {
-                    res.send(successDropOutMessage);
-                });
-            } else {
-                if (foundTopic.availableSlots > 0) {
-                    RegistrationController.createRegistration(foundTopic, user, topicId, (successRegistrationMessage) => {
-                        res.send(successRegistrationMessage);
-                    });
-                } else {
-                    res.send(MessageFormatter.formatErrorRegistrationMessage());
-                }
-            }
-        });
+
+    RegistrationController.isUserRegisteredOnTopic(topicId, user.id, (isAlreadyRegistered) => {
+        if (isAlreadyRegistered) {
+            RegistrationController.deleteRegistration(topicId, user, (successDropOutMessage) => {
+                res.send(successDropOutMessage);
+            });
+        } else {
+            RegistrationController.createRegistration(user, topicId, (registrationMessage) => {
+                res.send(registrationMessage);
+            });
+        }
     });
 });
 
