@@ -63,11 +63,12 @@ app.get('/oauth', (req, res) => {
 });
 
 app.post('/coach', (req, res) => {
+    let slots = extractTotalSlots(req.body.text);
     let newTopic = {
         coachSlackId: req.body.user_id,
         coachUsername: req.body.user_name,
         topicTitle: extractTitle(req.body.text),
-        totalSlots: extractTotalSlots(req.body.text),
+        totalSlots: slots,
         availableSlots: slots
     };
     CoachController.addTopic(newTopic, (coachTopicConfirmationMessage) =>{
