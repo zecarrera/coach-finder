@@ -50,6 +50,18 @@ class MessageFormatter {
         };
     }
 
+    static unknownErrorMessage() {
+        return {
+            "attachments": [
+                {
+                    "title": "Sorry, somethign went wrong!",
+                    "color": "danger",
+                    "text": "Please, try again!"
+                }
+            ]
+        };
+    }
+
     static formatTopicList (listOfTopicsToPresent, userId, callback) {
         let messageAttachments = [];
         let attachment;

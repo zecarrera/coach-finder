@@ -8,7 +8,9 @@ let Topic = require("./models/topic");
 let Registration = require("./models/registration");
 let MessageFormatter = require("./message-formatter");
 let RegistrationController = require("./controllers/registration-controller");
+let CoachController = require("./controllers/coach-controller");
 let LearnController = require("./controllers/learn-controller");
+let ParticipantsController = require("./controllers/participants-controller");
 let dataAccess = require("./data-manager/data-access");
 let clientId = process.env.CLIENT_ID;
 let clientSecret = process.env.CLIENT_SECRET;
@@ -61,22 +63,15 @@ app.get('/oauth', (req, res) => {
 });
 
 app.post('/coach', (req, res) => {
-    let slots = extractTotalSlots(req.body.text);
     let newTopic = {
         coachSlackId: req.body.user_id,
         coachUsername: req.body.user_name,
         topicTitle: extractTitle(req.body.text),
-        totalSlots: slots,
+        totalSlots: extractTotalSlots(req.body.text),
         availableSlots: slots
     };
-
-    dataAccess.insert(Topic, newTopic, (result) =>{
-        if (!result) {
-            console.log(error);
-        } else {
-            console.log("Topic created");
-            res.send(MessageFormatter.formatSuccessMessage(result));
-        }
+    CoachController.addTopic(newTopic, (coachTopicConfirmationMessage) =>{
+        res.send(coachTopicConfirmationMessage);
     });
 });
 
@@ -99,21 +94,14 @@ app.get('/participants/:id', (req, res) => {
     let requestedTopicId = mongoose.Types.ObjectId(req.params.id);
     let topicTitle;
 
-    dataAccess.findById(Topic, requestedTopicId, (foundTopic) => {
-        if (!foundTopic) {
-            console.log(error);
+    ParticipantsController.findRegisteredParticipants(requestedTopicId, (hasError, registeredParticipants, foundTopic)=>{
+        if(hasError){
             res.status(404).send('Not found');
-        } else {
-            dataAccess.findRegistrationByTopicId({topicId: requestedTopicId}, (registeredParticipants) => {
-                if (!registeredParticipants) {
-                    console.log(error);
-                    res.status(404).send('Not found');
-                } else {
-                    res.render('registrations/show', {participants:registeredParticipants, topic: foundTopic});
-                }
-            });
+        }else{
+            res.render('registrations/show', { participants: registeredParticipants, topic: foundTopic });            
         }
     });
+    
 });
 
 app.post('/registration', (req, res) => {
