@@ -19,10 +19,10 @@ describe('When user sends /learn', () => {
             }
         };
     };
-    describe('with topic set to "everything"', () => {
+    describe('with message set to "everything"', () => {
         beforeEach((done)=>{
             foundTopics = [];
-            request(defaultOptions("everything"), (error, response, body) => {
+            request(defaultOptions("everything"), (error, response) => {
                 if (error) throw new Error(error);
                 let slackMessage = JSON.parse(response.body);
                 foundTopics = slackMessage.attachments;
@@ -37,10 +37,10 @@ describe('When user sends /learn', () => {
         });
     });
 
-    describe('with topic set to "thing 1"', () => {
+    describe('with message set to "thing 1"', () => {
         beforeEach((done) => {
             foundTopics = [];
-            request(defaultOptions("thing 1"), (error, response, body) => {
+            request(defaultOptions("thing 1"), (error, response) => {
                 if (error) throw new Error(error);
                 let slackMessage = JSON.parse(response.body);
                 foundTopics = slackMessage.attachments;
@@ -55,10 +55,10 @@ describe('When user sends /learn', () => {
         });
     });
 
-    describe('with topic set to "not existent"', () => {
+    describe('with message set to "not existent"', () => {
         beforeEach((done) => {
             foundTopics = [];
-            request(defaultOptions("not existent"), (error, response, body) => {
+            request(defaultOptions("not existent"), (error, response) => {
                 if (error) throw new Error(error);
                 let slackMessage = JSON.parse(response.body);
                 foundTopics = slackMessage.attachments;
