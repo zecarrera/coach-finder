@@ -55,6 +55,27 @@ describe('When user sends /learn', () => {
         });
     });
 
+    describe('with message set to "thing"', () => {
+        beforeEach((done) => {
+            foundTopics = [];
+            request(defaultOptions("thing"), (error, response) => {
+                if (error) throw new Error(error);
+                let slackMessage = JSON.parse(response.body);
+                foundTopics = slackMessage.attachments;
+
+                done();
+            });
+        });
+
+        it("then returned list matches 3 topics", () => {
+            expect(foundTopics.length).toBe(3);
+            expect(foundTopics[0].title).toBe("thing 1");
+            expect(foundTopics[1].title).toBe("thing 2");
+            expect(foundTopics[2].title).toBe("thing 3");
+            
+        });
+    });
+
     describe('with message set to "not existent"', () => {
         beforeEach((done) => {
             foundTopics = [];

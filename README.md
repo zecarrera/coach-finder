@@ -1,7 +1,7 @@
 # coach-finder
 - Running locally
 1. `npm install -g localtunnel`
-2. Start local tunnel `lt --port 3131 --subdomain coachfindertest`
+2. Start local tunnel `lt --port 3131 --subdomain testcoachfinder`
 3. start local mongodb
 4. `npm start` on the app
 

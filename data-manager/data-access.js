@@ -49,7 +49,7 @@ module.exports.findById = (model, objectId, next) => {
 };
 
 module.exports.findTopic = (topic, next) => {
-    Topic.find(topic,  (error, foundTopic) => {
+    Topic.find({ topicTitle: new RegExp('.*' + topic.topicTitle + '.*', "i")},  (error, foundTopic) => {
         if (error) {
             console.log(error);
         } else {

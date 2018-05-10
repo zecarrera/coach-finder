@@ -4,7 +4,7 @@ let MessageFormatter = require("./../message-formatter");
 
 class LearnController {
     static presentAllTopics(userId, callback) {
-        dataAccess.findTopic({}, (foundTopics) => {
+        dataAccess.findTopic({topicTitle: ""}, (foundTopics) => {
             if (!foundTopics) {
                 console.log(error);
             } else {
