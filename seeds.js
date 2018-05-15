@@ -36,7 +36,8 @@ function seedDB() {
             coachUsername: "coachone",
             topicTitle: "thing 1",
             totalSlots: 10,
-            availableSlots: 10
+            availableSlots: 10,
+            _id: "5afb23f08016dcdc350c3481"
         },
         {
             coachSlackId: "67890",
