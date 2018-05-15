@@ -95,10 +95,6 @@ describe('When user sends /learn', () => {
         });
     });
 
-//TODO: tests to add
-// search for "thing" should bring all topics with "thing" (https://stackoverflow.com/questions/9824010/mongoose-js-find-user-by-username-like-value)
-
 //registration spec:
 // don't show join button if no slots are availableSlots
-// show button with different text depending if registered or not
 });
